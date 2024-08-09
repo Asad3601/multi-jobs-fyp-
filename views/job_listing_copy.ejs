@@ -9,7 +9,9 @@
                         <p id="total-job">Total Jobs:
                             <%= total_jobs %>
                         </p>
-                       
+                        <% if(query) {%>
+                            <%= query %>
+                            <%}%>
                             <!-- Table Start -->
                             <table class="table" border="2">
                                 <thead>
@@ -88,61 +90,3 @@
         </div>
     </div>
 </main>
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        var ajaxRequestSent = false; // Variable to track whether the AJAX request has been sent
-        
-        // Function to make the AJAX requests in parallel
-        function makeRequests() {
-            console.log("Making AJAX requests...");
-            var platforms = [
-                { platform: "Byat", route: "/byat" }, 
-                
-            ];
-
-            var requests = platforms.map(function(platform) {
-                return scrap(platform.route, platform.platform);
-            });
-
-            Promise.all(requests).then(function() {
-                console.log("All requests completed.");
-            }).catch(function(error) {
-                console.error("An error occurred during the AJAX requests:", error);
-            });
-        }
-    
-        // Call the function to make the request only if the request hasn't been sent already
-        var queryExists = '<%= query %>' !== ''; // Check if query is not empty
-        console.log("Query exists:", queryExists);
-
-        if (queryExists && !ajaxRequestSent) {
-            makeRequests();
-            ajaxRequestSent = true; // Set the flag to true to indicate that the request has been sent
-            console.log("AJAX request sent.");
-        } else {
-            console.log("AJAX request not sent. Either query doesn't exist or request was already sent.");
-        }
-    });
-
-    function scrap(route, platform) {
-        return new Promise(function(resolve, reject) {
-            // Add a class to the body tag to indicate that an AJAX request is in progress
-            $('body').addClass('ajax-request-in-progress');
-
-            // AJAX request for scraping other websites
-            $.ajax({
-                type: "POST",
-                url: route,
-                // headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Include CSRF token
-                data: { 'q': '<%= query %>' },
-                success: function(response) {
-                    alert(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    reject(error); // Reject the promise
-                }
-            });
-        });
-    }
-</script>
