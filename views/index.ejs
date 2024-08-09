@@ -1,0 +1,111 @@
+<!doctype html>
+<html class="no-js" lang="zxx">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>
+        <%= title %>
+    </title>
+
+
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="manifest" href="site.we/public/">
+    <link rel=" shortcut icon " type="image/x-icon " href="/public/assets/img/favicon.ico ">
+    <link rel="stylesheet " href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css ">
+
+    <!-- CSS here -->
+    <link rel="stylesheet " href="/public/assets/css/bootstrap.min.css">
+    <link rel="stylesheet " href="/public/assets/css/owl.carousel.min.css">
+    <link rel="stylesheet " href="/public/assets/css/flaticon.css">
+    <link rel="stylesheet " href="/public/assets/css/price_rangs.css">
+    <link rel="stylesheet " href="/public/assets/css/slicknav.css ">
+    <link rel="stylesheet " href="/public/assets/css/animate.min.css ">
+    <link rel="stylesheet " href="/public/assets/css/magnific-popup.css ">
+    <link rel="stylesheet " href="/public/assets/css/fontawesome-all.min.css ">
+    <link rel="stylesheet " href="/public/assets/css/themify-icons.css ">
+    <link rel="stylesheet " href="/public/assets/css/slick.css ">
+    <link rel="stylesheet " href="/public/assets/css/nice-select.css ">
+    <link rel="stylesheet " href="/public/assets/css/style.css ">
+    <style>
+        .hide-preloader {
+            display: none !important;
+            /* Ensure it hides the element */
+        }
+    </style>
+</head>
+
+<body>
+    <div id="preloader-active">
+        <div class="preloader d-flex align-items-center justify-content-center">
+            <div class="preloader-inner position-relative">
+                <div class="preloader-circle"></div>
+                <div class="preloader-img pere-text">
+                    <img src="/public/assets/img/logo/mj-logo.png" alt="Logo">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <%- include ('header') %>
+
+        <%- include(mainView) %>
+            <%- include ('footer') %>
+
+
+
+
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js "></script>
+                <!-- JS here -->
+
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js "></script>
+
+                <!-- All JS Custom Plugins Link Here here -->
+                <script src="/public/assets/js/vendor/modernizr-3.5.0.min.js"></script>
+                <!-- Jquery, Popper, Bootstrap -->
+                <script src="/public/assets/js/vendor/jquery-1.12.4.min.js"></script>
+
+                <script src="/public/assets/js/popper.min.js"></script>
+                <script src="/public/assets/js/bootstrap.min.js"></script>
+                <!-- Jquery Mobile Menu -->
+                <script src="/public/assets/js/jquery.slicknav.min.js"></script>
+
+                <!-- Jquery Slick , Owl-Carousel Plugins -->
+                <script src="/public/assets/js/owl.carousel.min.js"></script>
+                <script src="/public/assets/js/slick.min.js"></script>
+                <script src="/public/assets/js/price_rangs.js"></script>
+
+                <!-- One Page, Animated-HeadLin -->
+                <script src="/public/assets/js/wow.min.js"></script>
+                <script src="/public/assets/js/animated.headline.js"></script>
+                <script src="/public/assets/js/jquery.magnific-popup.js"></script>
+
+                <!-- Scrollup, nice-select, sticky -->
+                <script src="/public/assets/js/jquery.scrollUp.min.js"></script>
+                <script src="/public/assets/js/jquery.nice-select.min.js"></script>
+                <script src="/public/assets/js/jquery.sticky.js"></script>
+
+
+                <script src="/public/assets/js/contact.js"></script>
+                <script src="/public/assets/js/jquery.form.js"></script>
+                <script src="/public/assets/js/jquery.validate.min.js"></script>
+                <script src="/public/assets/js/mail-script.js"></script>
+                <script src="/public/assets/js/jquery.ajaxchimp.min.js"></script>
+
+                <!-- Jquery Plugins, main Jquery -->
+                <script src="/public/assets/js/plugins.js"></script>
+                <script src="/public/assets/js/main.js"></script>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Wait for 2 seconds (2000 milliseconds)
+                        setTimeout(function() {
+                            // Hide the preloader
+                            document.getElementById('preloader-active').classList.add('hide-preloader');
+                        }, 2000); // 2000 milliseconds = 2 seconds
+                    });
+                </script>
+
+
+</html>

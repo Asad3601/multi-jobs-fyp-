@@ -1,0 +1,42 @@
+<div class="container" style=" margin: 0px;">
+    <div class="row">
+        <div class="col-md-3" style="background-color: cornflowerblue; ">
+            <div class="sidebar">
+                <ul class="sidebar-nav" style="padding: 13px;">
+                    <li class="nav-item">
+                        <h6><a class="nav-link" href="save_jobs"> Saved Jobs </a></h6>
+                    </li>
+                    <hr>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9" style="padding: 30px;">
+            <h1>User Profile</h1>
+            <div class="user-profile">
+                <div class="profile-container">
+                    <% if (user){%>
+                        <img src="<%=user.user_image%>" alt="User Profile Picture" class="profile-pic rounded-circle" width="400px" height="200px"><br>
+                        <% } else {%>
+                            <img src="/public/assets/img/person.jpg" alt="User Profile Picture" class="profile-pic rounded-circle" width="150" height="150"><br><br>
+                            <% } %>
+
+                                <form action="/profile_picture" method="POST" enctype="multipart/form-data">
+                                    <label for="">Change Profile Picture: </label>
+                                    <input type="file" name="picture" id="">
+                                    <input type="submit" class="btn" value="Change">
+                                </form>
+                </div>
+                <br>
+                <div class="user-details">
+                    <p><strong>Username:</strong>
+                        <%= user.username %>
+                    </p>
+                    <p><strong>Email:</strong>
+                        <%= user.email %>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,53 @@
+<div class="container" style="margin: 0px;">
+    <div class="row">
+        <div class="col-md-3" style="background-color: cornflowerblue; ">
+            <div class="sidebar">
+                <ul class="sidebar-nav" style="padding: 13px;">
+                    <li class="nav-item">
+                        <h6><a class="nav-link" href="/user_profile"> Profile </a></h6>
+                    </li>
+                    <hr>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9" style="padding: 30px;">
+            <h1>Saved Jobs</h1>
+            <% if (save_jobs){%>
+                <!-- <span style="margin-left: 600px; margin-bottom: 20px;"><a 
+                href="/delete_all" class="btn btn-danger"> Delete All</a></span> -->
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Description</th>
+                                <th>Location</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% save_jobs.forEach((job) => { %>
+                                <tr>
+                                    <td>
+                                        <a href="<%= job.job_url %>">
+                                            <b><%= job.job_title %></b>
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <%= job.description %>
+                                    </td>
+                                    <td>
+                                        <%= job.company %>
+                                    </td>
+
+                                </tr>
+                                <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+                <% }else {%>
+                    <p>No job listings available.</p>
+                    <% } %>
+        </div>
+    </div>
+</div>
