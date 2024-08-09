@@ -9,78 +9,78 @@
                         <p id="total-job">Total Jobs:
                             <%= total_jobs %>
                         </p>
-                       
-                            <!-- Table Start -->
-                            <table class="table" border="2">
-                                <thead>
+
+                        <!-- Table Start -->
+                        <table class="table" border="2">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Company & Location</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% jobs.forEach((job) => { %>
                                     <tr>
-                                        <th>Title</th>
-                                        <th>Description</th>
-                                        <th>Company & Location</th>
-                                        <th>Action</th>
+                                        <td>
+                                            <a href="<%= job.job_url %>">
+                                                <b><%= job.job_title %></b>
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <%= job.description %>
+                                        </td>
+                                        <td>
+                                            <%= job.company %>
+                                        </td>
+                                        <td>
+                                            <a href="/job/<%= job._id %>" class="btn btn-primary">Save</a>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <% jobs.forEach((job) => { %>
-                                        <tr>
-                                            <td>
-                                                <a href="<%= job.job_url %>">
-                                                    <b><%= job.job_title %></b>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <%= job.description %>
-                                            </td>
-                                            <td>
-                                                <%= job.company %>
-                                            </td>
-                                            <td>
-                                                <a href="/job/<%= job._id %>" class="btn btn-primary">Save</a>
-                                            </td>
-                                        </tr>
-                                        <% }); %>
-                                </tbody>
-                            </table>
-                            <br><br>
-                            <!-- Table End -->
-                            <!-- Pagination Start -->
-                            <div class="pagination-area pb-115 text-center">
-                                <div class="container">
-                                    <div class="row">
-                                        <div class="single-wrap d-flex justify-content-start">
-                                            <p id="total-pagination">Total Pages:
-                                                <%= totalPages %>
-                                            </p>
-                                        </div>
-                                        <div class="col-xl-12">
-                                            <div class="single-wrap d-flex justify-content-center" id="job-listings-container2">
-                                                <nav aria-label="Page navigation example">
-                                                    <ul class="pagination justify-content-start">
-                                                        <% if (currentPage > 1) { %>
-                                                            <li class="page-item">
-                                                                <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
-                                                            </li>
-                                                            <% } %>
-                                                                <% for (let i = startPage; i <= endPage; i++) { %>
-                                                                    <li class="page-item <%= i === currentPage ? 'active' : '' %>">
-                                                                        <a class="page-link" href="?page=<%= i %>">
-                                                                            <%= i %>
-                                                                        </a>
-                                                                    </li>
-                                                                    <% } %>
-                                                                        <% if (currentPage < totalPages) { %>
-                                                                            <li class="page-item">
-                                                                                <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
-                                                                            </li>
-                                                                            <% } %>
-                                                    </ul>
-                                                </nav>
-                                            </div>
+                                    <% }); %>
+                            </tbody>
+                        </table>
+                        <br><br>
+                        <!-- Table End -->
+                        <!-- Pagination Start -->
+                        <div class="pagination-area pb-115 text-center">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="single-wrap d-flex justify-content-start">
+                                        <p id="total-pagination">Total Pages:
+                                            <%= totalPages %>
+                                        </p>
+                                    </div>
+                                    <div class="col-xl-12">
+                                        <div class="single-wrap d-flex justify-content-center" id="job-listings-container2">
+                                            <nav aria-label="Page navigation example">
+                                                <ul class="pagination justify-content-start">
+                                                    <% if (currentPage > 1) { %>
+                                                        <li class="page-item">
+                                                            <a class="page-link" href="?page=<%= currentPage - 1 %>">Previous</a>
+                                                        </li>
+                                                        <% } %>
+                                                            <% for (let i = startPage; i <= endPage; i++) { %>
+                                                                <li class="page-item <%= i === currentPage ? 'active' : '' %>">
+                                                                    <a class="page-link" href="?page=<%= i %>">
+                                                                        <%= i %>
+                                                                    </a>
+                                                                </li>
+                                                                <% } %>
+                                                                    <% if (currentPage < totalPages) { %>
+                                                                        <li class="page-item">
+                                                                            <a class="page-link" href="?page=<%= currentPage + 1 %>">Next</a>
+                                                                        </li>
+                                                                        <% } %>
+                                                </ul>
+                                            </nav>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Pagination End -->
+                        </div>
+                        <!-- Pagination End -->
                     </section>
                     <!-- Featured_job_end -->
                 </div>
@@ -88,31 +88,37 @@
         </div>
     </div>
 </main>
+
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var ajaxRequestSent = false; // Variable to track whether the AJAX request has been sent
-        
+        var responseData = null; // Variable to store the response data
+
         // Function to make the AJAX requests in parallel
         function makeRequests() {
             console.log("Making AJAX requests...");
-            var platforms = [
-                { platform: "Byat", route: "/byat" }, 
-                
-            ];
+            var platforms = [{
+                platform: "Byat",
+                route: "/byat"
+            }];
 
             var requests = platforms.map(function(platform) {
                 return scrap(platform.route, platform.platform);
             });
 
-            Promise.all(requests).then(function() {
-                console.log("All requests completed.");
-            }).catch(function(error) {
-                console.error("An error occurred during the AJAX requests:", error);
-            });
+            Promise.all(requests)
+                .then(function() {
+                    console.log("All requests completed.");
+                    console.log("Stored response data:", responseData);
+                })
+                .catch(function(error) {
+                    console.error("An error occurred during the AJAX requests:", error);
+                });
         }
-    
-        // Call the function to make the request only if the request hasn't been sent already
-        var queryExists = '<%= query %>' !== ''; // Check if query is not empty
+
+        // Retrieve and check if the query exists
+        var query = '<%= query %>'.trim(); // Trim any extraneous whitespace
+        var queryExists = query.length > 0; // Check if query is not empty
         console.log("Query exists:", queryExists);
 
         if (queryExists && !ajaxRequestSent) {
@@ -122,27 +128,33 @@
         } else {
             console.log("AJAX request not sent. Either query doesn't exist or request was already sent.");
         }
-    });
 
-    function scrap(route, platform) {
-        return new Promise(function(resolve, reject) {
-            // Add a class to the body tag to indicate that an AJAX request is in progress
-            $('body').addClass('ajax-request-in-progress');
+        // Define the function for making AJAX requests
+        function scrap(route, platform) {
+            return new Promise(function(resolve, reject) {
+                // Add a class to the body tag to indicate that an AJAX request is in progress
+                $('body').addClass('ajax-request-in-progress');
 
-            // AJAX request for scraping other websites
-            $.ajax({
-                type: "POST",
-                url: route,
-                // headers: { "X-CSRFToken": "{{ csrf_token }}" }, // Include CSRF token
-                data: { 'q': '<%= query %>' },
-                success: function(response) {
-                    alert(response);
-                },
-                error: function(xhr, status, error) {
-                    console.error(xhr.responseText);
-                    reject(error); // Reject the promise
-                }
+                // AJAX request for scraping other websites
+                $.ajax({
+                    type: "POST",
+                    url: route,
+                    data: {
+                        'q': query
+                    },
+                    success: function(response) {
+                        responseData = response; // Store the response data in the variable
+                        resolve(); // Resolve the promise
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        reject(error); // Reject the promise
+                    },
+                    complete: function() {
+                        $('body').removeClass('ajax-request-in-progress'); // Remove the class once request is complete
+                    }
+                });
             });
-        });
-    }
+        }
+    });
 </script>

@@ -10,8 +10,8 @@ async function byat_com(q) {
 
         // Set up WebDriver with Chrome in headless mode
         let options = new chrome.Options();
-        options.addArguments('headless'); // Use headless mode
-        options.addArguments('disable-gpu'); // Disable GPU (optional)
+        // options.addArguments('headless'); // Use headless mode
+        // options.addArguments('disable-gpu'); // Disable GPU (optional)
 
         driver = await new Builder()
             .forBrowser('chrome')

@@ -3,7 +3,7 @@ const Jobs = require('../models/Jobs');
 
 const { Builder, By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const {byat_com} = require('../scraper/scraper');
+const { byat_com } = require('../scraper/scraper');
 
 exports.Job_ustad = async(req, res) => {
     try {
@@ -69,7 +69,7 @@ exports.Job_ustad = async(req, res) => {
                         console.error('Error saving job to database:', dbError);
                     }
 
-                    
+
                 }
             }
         }
@@ -85,106 +85,59 @@ exports.Job_ustad = async(req, res) => {
 };
 
 exports.all_jobs = async(req, res) => {
-        let query=req.query.q;
-        if(query)
-        {
-            try {
-                const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-                const jobsPerPage = 25;
-                const skip = (page - 1) * jobsPerPage;
-        
-                // Get the total number of jobs
-                const total_jobs = await Jobs.countDocuments({});
-        
-                // Fetch jobs for the current page
-                const jobs = await Jobs.find({})
-                    .skip(skip)
-                    .limit(jobsPerPage);
-        
-                // Calculate total pages
-                const totalPages = Math.ceil(total_jobs / jobsPerPage);
-        
-                // Determine the range of pages to display
-                const maxPagesToShow = 5;
-                const halfMaxPages = Math.floor(maxPagesToShow / 2);
-                let startPage = Math.max(1, page - halfMaxPages);
-                let endPage = Math.min(totalPages, page + halfMaxPages);
-        
-                if (endPage - startPage + 1 < maxPagesToShow) {
-                    if (startPage === 1) {
-                        endPage = Math.min(maxPagesToShow, totalPages);
-                    } else if (endPage === totalPages) {
-                        startPage = Math.max(1, totalPages - maxPagesToShow + 1);
-                    }
-                }
-        
-                res.render('index', {
-                    query,
-                    jobs,
-                    total_jobs,
-                    totalPages,
-                    currentPage: page,
-                    startPage,
-                    endPage,
-                    title: 'Jobs',
-                    mainView: 'job_listing'
-                });
-            } catch (error) {
-                console.error('Error fetching jobs:', error);
-                res.status(500).json({ error: 'Error fetching jobs' });
+    let query = req.query.q || '';
+    try {
+        const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
+        const jobsPerPage = 25;
+        const skip = (page - 1) * jobsPerPage;
+
+        // Get the total number of jobs
+        const total_jobs = await Jobs.countDocuments({});
+
+        // Fetch jobs for the current page
+        const jobs = await Jobs.find({})
+            .skip(skip)
+            .limit(jobsPerPage);
+
+        // Calculate total pages
+        const totalPages = Math.ceil(total_jobs / jobsPerPage);
+
+        // Determine the range of pages to display
+        const maxPagesToShow = 5;
+        const halfMaxPages = Math.floor(maxPagesToShow / 2);
+        let startPage = Math.max(1, page - halfMaxPages);
+        let endPage = Math.min(totalPages, page + halfMaxPages);
+
+        if (endPage - startPage + 1 < maxPagesToShow) {
+            if (startPage === 1) {
+                endPage = Math.min(maxPagesToShow, totalPages);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, totalPages - maxPagesToShow + 1);
             }
         }
-        else{
-            try {
-                const page = parseInt(req.query.page) || 1; // Default to page 1 if not provided
-                const jobsPerPage = 25;
-                const skip = (page - 1) * jobsPerPage;
-        
-                // Get the total number of jobs
-                const total_jobs = await Jobs.countDocuments({});
-        
-                // Fetch jobs for the current page
-                const jobs = await Jobs.find({})
-                    .skip(skip)
-                    .limit(jobsPerPage);
-        
-                // Calculate total pages
-                const totalPages = Math.ceil(total_jobs / jobsPerPage);
-        
-                // Determine the range of pages to display
-                const maxPagesToShow = 5;
-                const halfMaxPages = Math.floor(maxPagesToShow / 2);
-                let startPage = Math.max(1, page - halfMaxPages);
-                let endPage = Math.min(totalPages, page + halfMaxPages);
-        
-                if (endPage - startPage + 1 < maxPagesToShow) {
-                    if (startPage === 1) {
-                        endPage = Math.min(maxPagesToShow, totalPages);
-                    } else if (endPage === totalPages) {
-                        startPage = Math.max(1, totalPages - maxPagesToShow + 1);
-                    }
-                }
-        
-                res.render('index', {
-                    jobs,
-                    total_jobs,
-                    totalPages,
-                    currentPage: page,
-                    startPage,
-                    endPage,
-                    title: 'Jobs',
-                    mainView: 'job_listing'
-                });
-            } catch (error) {
-                console.error('Error fetching jobs:', error);
-                res.status(500).json({ error: 'Error fetching jobs' });
-            }
-        }
+
+        res.render('index', {
+            query,
+            jobs,
+            total_jobs,
+            totalPages,
+            currentPage: page,
+            startPage,
+            endPage,
+            title: 'Jobs',
+            mainView: 'job_listing'
+        });
+    } catch (error) {
+        console.error('Error fetching jobs:', error);
+        res.status(500).json({ error: 'Error fetching jobs' });
+    }
+
 };
 
-exports.byat_Jobs=async(req,res)=>{
+exports.byat_Jobs = async(req, res) => {
+    console.log(req.body.q);
     await byat_com(req.body.q);
-    res.json(req.body.q);
+    res.redirect('/jobs');
 };
 
 
