@@ -88,8 +88,129 @@
         </div>
     </div>
 </main>
-
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var ajaxRequestSent = false; // Variable to track whether the AJAX request has been sent
+        var responseData = null; // Variable to store the response data
+
+        // Function to make the AJAX requests in parallel
+        function makeRequests() {
+            console.log("Making AJAX requests...");
+            var platforms = [{
+                platform: "Byat",
+                route: "/byat"
+                    // }, {
+                    //     platform: "Ustad",
+                    //     route: "/job_ustad"
+            }];
+
+            var requests = platforms.map(function(platform) {
+                return scrap(platform.route, platform.platform);
+            });
+
+            Promise.all(requests)
+                .then(function() {
+                    console.log("All requests completed.");
+                    console.log("Stored response data:", responseData);
+                })
+                .catch(function(error) {
+                    console.error("An error occurred during the AJAX requests:", error);
+                });
+        }
+
+        // Retrieve and check if the query exists
+        var query = '<%= query %>'.trim(); // Trim any extraneous whitespace
+        var queryExists = query.length > 0; // Check if query is not empty
+        console.log("Query exists:", queryExists);
+
+        if (queryExists && !ajaxRequestSent) {
+            makeRequests();
+            ajaxRequestSent = true; // Set the flag to true to indicate that the request has been sent
+            console.log("AJAX request sent.");
+        } else {
+            console.log("AJAX request not sent. Either query doesn't exist or request was already sent.");
+        }
+
+        // Define the function for making AJAX requests
+        function scrap(route, platform) {
+            return new Promise(function(resolve, reject) {
+                // Add a class to the body tag to indicate that an AJAX request is in progress
+                $('body').addClass('ajax-request-in-progress');
+
+                // AJAX request for scraping other websites
+                $.ajax({
+                    type: "POST",
+                    url: route,
+                    data: {
+                        'q': query
+                    },
+                    success: function(response) {
+                        // alert(response.t)
+                        alert(response.total_jobs);
+
+                        $('body').removeClass('ajax-request-in-progress');
+
+                        // Remove any existing rows from the table
+                        $('#job-listings-table tbody').empty();
+
+                        // Append each job listing to the table
+                        $.each(response.jobs, function(index, job) {
+                            var row = '<tr>' +
+                                '<td><a href="' + job.job_url + '"><b>' + job.job_title + '</b></a></td>' +
+                                '<td>' + job.description + '</td>' +
+                                '<td>' + job.company + '</td>' +
+                                '<td>' +
+                                '<a href="/job/' + job._id + '" class="btn btn-primary">Save</a>' +
+                                '</td>' +
+                                '</tr>';
+                            $('#job-listings-table tbody').append(row);
+                        });
+
+                        // Set the total jobs count
+                        $('#total-job').text('Total Jobs: ' + response.total_jobs);
+
+                        // Set the total pages count
+                        $('#total-pagination').text('Total Pages: ' + response.totalPages);
+
+                        // Update pagination links
+                        var paginationHtml = '';
+                        if (response.currentPage > 1) {
+                            paginationHtml += '<li class="page-item">' +
+                                '<a class="page-link" href="?page=' + (response.currentPage - 1) + '">Previous</a>' +
+                                '</li>';
+                        }
+
+                        for (let i = response.startPage; i <= response.endPage; i++) {
+                            paginationHtml += '<li class="page-item ' + (i === response.currentPage ? 'active' : '') + '">' +
+                                '<a class="page-link" href="?page=' + i + '">' + i + '</a>' +
+                                '</li>';
+                        }
+
+                        if (response.currentPage < response.totalPages) {
+                            paginationHtml += '<li class="page-item">' +
+                                '<a class="page-link" href="?page=' + (response.currentPage + 1) + '">Next</a>' +
+                                '</li>';
+                        }
+
+                        $('#pagination-links').html(paginationHtml);
+
+                        alert('Data Scraped From ' + platform);
+                        resolve(); // Resolve the promise
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                        reject(error); // Reject the promise
+                    },
+                    complete: function() {
+                        $('body').removeClass('ajax-request-in-progress'); // Remove the class once request is complete
+                    }
+                });
+            });
+        }
+    });
+</script>
+
+<!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
         var ajaxRequestSent = false; // Variable to track whether the AJAX request has been sent
         var responseData = null; // Variable to store the response data
@@ -143,8 +264,64 @@
                         'q': query
                     },
                     success: function(response) {
-                        responseData = response; // Store the response data in the variable
-                        resolve(); // Resolve the promise
+                        $('body').removeClass('ajax-request-in-progress');
+
+                        // Remove any existing rows from the table
+                        $('#job-listings-table tbody').empty();
+
+                        // Append each job listing to the table
+                        $.each(response.job_listings, function(index, job) {
+                            var row = '<tr>' +
+                                '<td><a href="' + job.url + '"><b>' + job.title + '</b></a></td>' +
+                                '<td>' + job.discription + '</td>' + // corrected 'discription' to 'description'
+                                '<td>' + job.location + '</td>' +
+                                '<td>' +
+                                '<form class="save-job-form">' + // changed id to class to avoid duplicate IDs
+                                '{% csrf_token %}' +
+                                '<input type="hidden" name="job_id" value="' + job.id + '">' +
+                                '<button type="button" class="btn btn-outline-secondary save-btn">' +
+                                '<i class="fas fa-save"></i> Save' +
+                                '</button>' +
+                                '</form>' +
+                                '</td>' +
+                                '</tr>';
+                            $('#job-listings-table tbody').append(row);
+                        });
+
+                        // Set the total jobs count
+                        $('#total-job').text('Total Jobs: ' + response.total_jobs);
+
+                        // Set the total pages count
+                        $('#total-pagination').text('Total Pages: ' + response.total_pages);
+
+                        // Update pagination links
+                        $('#pagination-links').empty();
+
+                        $.each(response.limited_page_range, function(index, num) {
+                            var pageLink = '<li class="page-item ' + (num == response.current_page ? 'active' : '') + '">' +
+                                '<a class="page-link" href="?page=' + num + '" data-page="' + num + '">' + num + '</a>' +
+                                '</li>';
+                            $('#pagination-links').append(pageLink);
+                        });
+
+                        // Add Previous button if available
+                        if (response.has_previous) {
+                            var previousPageLink = '<li class="page-item">' +
+                                '<a class="page-link" href="?page=' + (parseInt(response.current_page) - 1) + '">Previous</a>' +
+                                '</li>';
+                            $('#pagination-links').prepend(previousPageLink);
+                        }
+
+                        // Add Next button if available
+                        if (response.has_next) {
+                            var nextPageLink = '<li class="page-item">' +
+                                '<a class="page-link" href="?page=' + (parseInt(response.current_page) + 1) + '">Next</a>' +
+                                '</li>';
+                            $('#pagination-links').append(nextPageLink);
+                        }
+
+                        alert('Data Scraped From ' + platform);
+                        resolve(); // Resolve the promise// Resolve the promise
                     },
                     error: function(xhr, status, error) {
                         console.error(xhr.responseText);
@@ -157,4 +334,4 @@
             });
         }
     });
-</script>
+</script> -->

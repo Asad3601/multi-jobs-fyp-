@@ -3,9 +3,10 @@ const Jobs = require('../models/Jobs');
 
 const { Builder, By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const { byat_com } = require('../scraper/scraper');
+const { byat_com, Job_ustad } = require('../scraper/scraper');
 
-exports.Job_ustad = async(req, res) => {
+exports.indeed = async(req, res) => {
+    await Jobs.deleteMany({});
     try {
         let query = req.body.query;
 
@@ -115,7 +116,8 @@ exports.all_jobs = async(req, res) => {
                 startPage = Math.max(1, totalPages - maxPagesToShow + 1);
             }
         }
-
+        console.log(totalPages);
+        console.log(total_jobs);
         res.render('index', {
             query,
             jobs,
@@ -134,12 +136,86 @@ exports.all_jobs = async(req, res) => {
 
 };
 
+// Function to handle job requests and response
 exports.byat_Jobs = async(req, res) => {
-    console.log(req.body.q);
-    await byat_com(req.body.q);
-    res.redirect('/jobs');
+    try {
+        console.log(req.body.q);
+        const result = await byat_com(req.body.q); // Call to byat_com function
+
+        if (result.success) {
+            await add_jobs(req, res); // Call to add_jobs to get and send jobs data
+        } else {
+            res.status(500).json({
+                success: false,
+                message: result.message
+            });
+        }
+    } catch (error) {
+        console.error('Error in byat_Jobs:', error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
 };
 
+exports.Job_ustad = async(req, res) => {
+    try {
+        // console.log(req.body.q);
+        const result = await Job_ustad(req.body.q); // Call to byat_com function
+
+        if (result.success) {
+            await add_jobs(req, res); // Call to add_jobs to get and send jobs data
+        } else {
+            res.status(500).json({
+                success: false,
+                message: result.message
+            });
+        }
+    } catch (error) {
+        console.error('Error in ustad_Jobs:', error);
+        res.status(500).json({ error: 'An error occurred' });
+    }
+};
+
+// Function to add jobs to the response
+async function add_jobs(req, res) {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const jobsPerPage = 25;
+        const skip = (page - 1) * jobsPerPage;
+
+        const total_jobs = await Jobs.countDocuments({});
+        const jobs = await Jobs.find({})
+            .skip(skip)
+            .limit(jobsPerPage);
+
+        const totalPages = Math.ceil(total_jobs / jobsPerPage);
+
+        const maxPagesToShow = 5;
+        const halfMaxPages = Math.floor(maxPagesToShow / 2);
+        let startPage = Math.max(1, page - halfMaxPages);
+        let endPage = Math.min(totalPages, page + halfMaxPages);
+
+        if (endPage - startPage + 1 < maxPagesToShow) {
+            if (startPage === 1) {
+                endPage = Math.min(maxPagesToShow, totalPages);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, totalPages - maxPagesToShow + 1);
+            }
+        }
+
+        // Send response
+        res.json({
+            jobs,
+            total_jobs,
+            totalPages,
+            currentPage: page,
+            startPage,
+            endPage,
+        });
+    } catch (error) {
+        console.error('Error fetching jobs:', error);
+        res.status(500).json({ error: 'Error fetching jobs' });
+    }
+}
 
 
 
