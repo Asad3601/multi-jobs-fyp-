@@ -177,7 +177,78 @@ async function Job_ustad(query) {
 }
 
 
-module.exports = { byat_com, Job_ustad };
+async function glassdoor(q) {
+    try {
+        // Trim and replace spaces with hyphens, then URL encode the query
+        let query = q.trim().replace(/\s+/g, '-');
+
+        // Construct the URL
+        const url = `https://www.glassdoor.com/Job/pakistan-${query}-jobs-SRCH_IL.0,8_IN192_KO9,22.htm`;
+
+        // Set up WebDriver with Chrome in headless mode
+        let options = new chrome.Options();
+        // options.addArguments('headless'); // Use headless mode
+        // options.addArguments('disable-gpu'); // Add other arguments as needed
+
+        let driver = await new Builder()
+            .forBrowser('chrome')
+            .setChromeOptions(options)
+            .build();
+
+        await driver.get(url);
+        let results = [];
+
+        // Extract data from the specified elements
+        let articles = await driver.findElements(By.className('JobCard_jobCardContainer___hKKI'));
+        for (let article of articles) {
+            let result = {};
+            try {
+                let titleElement = await article.findElement(By.css('a'));
+                result.title = await titleElement.getText();
+                result.href = await titleElement.getAttribute('href');
+
+                let comElement = await article.findElement(By.className('EmployerProfile_employerInfo__d8uSE'));
+                let companyName = await comElement.getText();
+
+                let locElement = await article.findElement(By.className('JobCard_location__rCz3x'));
+                let location = await locElement.getText();
+
+                // Concatenate company name and location
+                result.company = `${companyName} ${location}`;
+
+                let contentElement = await article.findElement(By.className('JobCard_jobDescriptionSnippet__yWW8q'));
+                result.content = await contentElement.getText();
+
+                if (result.title && result.href && result.company && result.content) {
+                    // Save job to MongoDB
+                    let job = new Jobs({
+                        job_title: result.title,
+                        job_url: result.href,
+                        company: result.company, // Concatenated company and location
+                        description: result.content
+                    });
+
+                    try {
+                        await job.save();
+                    } catch (dbError) {
+                        console.error('Error saving job to database:', dbError);
+                    }
+                }
+            } catch (e) {
+                console.error('Error extracting element:', e);
+                continue; // Skip this result if any element is missing
+            }
+        }
+
+        await driver.quit();
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        throw error; // Re-throw error to handle in calling function
+    }
+}
+
+module.exports = { byat_com, Job_ustad, glassdoor };
 
 
 
@@ -193,7 +264,4 @@ module.exports = { byat_com, Job_ustad };
 
 
 
-// Export the function
-module.exports = {
-    byat_com
-};
+// Export the functio

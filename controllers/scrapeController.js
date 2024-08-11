@@ -3,7 +3,7 @@ const Jobs = require('../models/Jobs');
 
 const { Builder, By } = require('selenium-webdriver');
 const chrome = require('selenium-webdriver/chrome');
-const { byat_com, Job_ustad } = require('../scraper/scraper');
+const { byat_com, Job_ustad, glassdoor } = require('../scraper/scraper');
 
 exports.indeed = async(req, res) => {
     await Jobs.deleteMany({});
@@ -157,20 +157,33 @@ exports.byat_Jobs = async(req, res) => {
 };
 
 exports.Job_ustad = async(req, res) => {
-    try {
-        // console.log(req.body.q);
-        const result = await Job_ustad(req.body.q); // Call to byat_com function
+    console.log("Hello from Job ustad.");
+    // try {
+    //     // console.log(req.body.q);
+    const result = await Job_ustad(req.body.q); // Call to byat_com function
 
-        if (result.success) {
-            await add_jobs(req, res); // Call to add_jobs to get and send jobs data
-        } else {
-            res.status(500).json({
-                success: false,
-                message: result.message
-            });
-        }
+    //     if (result.success) {
+    //         await add_jobs(req, res); // Call to add_jobs to get and send jobs data
+    //     } else {
+    //         res.status(500).json({
+    //             success: false,
+    //             message: result.message
+    //         });
+    //     }
+    // } catch (error) {
+    //     console.error('Error in ustad_Jobs:', error);
+    //     res.status(500).json({ error: 'An error occurred' });
+    // }
+};
+
+exports.Job_glassdoor = async(req, res) => {
+    try {
+        console.log(req.body.q);
+        await glassdoor(req.body.q); // Call to glassdoor function
+        // Optionally, call add_jobs if it needs to be triggered here
+        await add_jobs(req, res); // Ensure add_jobs is designed to handle requests and send responses
     } catch (error) {
-        console.error('Error in ustad_Jobs:', error);
+        console.error('Error in Job_glassdoor:', error);
         res.status(500).json({ error: 'An error occurred' });
     }
 };

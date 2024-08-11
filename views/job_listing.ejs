@@ -99,9 +99,9 @@
             var platforms = [{
                 platform: "Byat",
                 route: "/byat"
-                    // }, {
-                    //     platform: "Ustad",
-                    //     route: "/job_ustad"
+            }, {
+                platform: 'Glassdoor',
+                route: '/glassdoor'
             }];
 
             var requests = platforms.map(function(platform) {
@@ -145,11 +145,6 @@
                         'q': query
                     },
                     success: function(response) {
-                        // alert(response.t)
-                        alert(response.total_jobs);
-
-                        $('body').removeClass('ajax-request-in-progress');
-
                         // Remove any existing rows from the table
                         $('#job-listings-table tbody').empty();
 
@@ -209,6 +204,7 @@
         }
     });
 </script>
+
 
 <!-- <script>
     document.addEventListener("DOMContentLoaded", function() {
